@@ -1,0 +1,268 @@
+========================================================
+ZING MP3 AUTOMATION — CONTEXT FILE CHO CLAUDE CODE
+Đọc file này trước khi viết bất kỳ test case nào
+========================================================
+
+## THÔNG TIN PROJECT
+- App: Zing MP3
+- Package: com.zing.mp3
+- Device: RFCX309KX8Z
+- Platform: Android
+- Framework: Python + Pytest + Appium v2
+- appActivity: com.zing.mp3.ui.activity.MainScreenActivity
+
+## CẤU TRÚC PROJECT
+pages/base_page.py       → các hàm: wait_and_tap, tap, find, get_text, type_text, is_visible, scroll_down, scroll_up
+locators/android_locators.py → AndroidHomeLocators, AndroidSearchLocators, AndroidPlayerLocators, AndroidLoginLocators
+tests/                   → đặt file test ở đây
+conftest.py              → driver (scope=session), reset_to_home (autouse), dismiss_popup, screenshot_on_failure
+
+--------------------------------------------------------
+## 9.1 LOCATOR — QUY TẮC CHỌN ĐÚNG LOẠI
+--------------------------------------------------------
+
+THỨ TỰ ƯU TIÊN:
+1. id (resource-id)     → ổn định nhất, nhanh nhất
+   ("id", "com.zing.mp3:id/tên_element")
+
+2. accessibility id     → dùng khi không có resource-id
+   ("accessibility id", "tên_accessible")
+
+3. xpath theo text      → dùng khi cần tìm theo nội dung
+   ("xpath", "//android.widget.TextView[@text='Khám phá']")
+
+4. xpath theo index     → dùng khi nhiều element cùng resource-id
+   ("xpath", "(//android.widget.ImageView[@resource-id='com.zing.mp3:id/icon'])[2]")
+
+QUY TẮC BẮT BUỘC:
+- Bên trong xpath LUÔN dùng dấu ' (nháy đơn), KHÔNG dùng " (nháy kép)
+  ĐÚNG:  ("xpath", "//element[@resource-id='com.zing.mp3:id/icon']")
+  SAI:   ("xpath", "//element[@resource-id="com.zing.mp3:id/icon"]")  ← SyntaxError
+
+- Khi dùng id: KHÔNG có dấu // ở đầu
+  ĐÚNG:  ("id", "com.zing.mp3:id/btn_play")
+  SAI:   ("id", "//android...[@resource-id='com.zing.mp3:id/btn_play']")  ← dùng sai type
+
+- KHÔNG dùng xpath quá dài (dễ vỡ khi app update UI)
+  SAI:  //android.widget.FrameLayout[1]/android.widget.LinearLayout[2]/...
+
+--------------------------------------------------------
+## 9.2 THỜI GIAN CHỜ — DÙNG ĐÚNG HÀM
+--------------------------------------------------------
+
+CÁC HÀM WAIT (ưu tiên dùng):
+- page.wait_and_tap(locator)          → chờ clickable rồi mới tap
+- page.wait_for_visible(locator)      → chờ hiển thị rồi mới dùng
+- driver.implicitly_wait(10)          → đã set sẵn trong conftest.py
+
+time.sleep() — CHỈ dùng khi:
+- Chờ animation chuyển màn hình: time.sleep(1) hoặc time.sleep(2)
+- Chờ kết quả tìm kiếm load: time.sleep(2)
+- KHÔNG dùng time.sleep > 3 giây
+
+THỨ TỰ ĐÚNG:
+  page.wait_and_tap(BUTTON)    # tap rồi
+  time.sleep(2)                # chờ màn hình mới load xong
+  assert page.is_visible(...)  # kiểm tra kết quả
+
+KHÔNG làm:
+  page.tap(BUTTON)             # tap không chờ → dễ fail
+  assert page.is_visible(...)  # kiểm tra ngay → chưa load xong
+
+--------------------------------------------------------
+## 9.3 XỬ LÝ POPUP & QUẢNG CÁO
+--------------------------------------------------------
+
+NGUYÊN TẮC:
+- conftest.py đã có dismiss_popup() — tự chạy trước mỗi test
+- Test case KHÔNG cần gọi dismiss_popup() ở đầu test
+- Nếu popup xuất hiện GIỮA test: thêm try/except xử lý tại chỗ
+
+CÁCH XỬ LÝ POPUP GIỮA TEST:
+  try:
+      driver.find_element("id", "com.zing.mp3:id/btn_close").click()
+      time.sleep(0.5)
+  except Exception:
+      pass  # không có popup → bỏ qua, tiếp tục test
+
+KHÔNG làm:
+  assert không có popup  ← làm fail test khi không có popup
+  time.sleep(5) chờ popup tự tắt  ← lãng phí thời gian
+
+THÊM POPUP MỚI VÀO conftest.py:
+  Tìm hàm dismiss_popup() → thêm resource-id mới vào danh sách popup_ids
+
+--------------------------------------------------------
+## 9.4 TRÁNH FLAKY TEST
+--------------------------------------------------------
+
+CÁC LỖI HAY GẶP VÀ CÁCH TRÁNH:
+
+1. TimeoutException
+   Nguyên nhân: locator sai hoặc element chưa load
+   Fix: dùng Appium Inspector lấy đúng locator
+        tăng timeout: page.wait_and_tap(locator, timeout=15)
+
+2. NoSuchElementError
+   Nguyên nhân: element không tồn tại trên màn hình hiện tại
+   Fix: kiểm tra app đang ở đúng màn hình chưa
+        thêm time.sleep(2) sau khi chuyển màn hình
+
+3. SyntaxError: unterminated string literal
+   Nguyên nhân: thiếu dấu " đóng trong locator
+   Fix: kiểm tra cặp nháy trong android_locators.py
+
+4. SyntaxError: invalid syntax / perhaps you forgot a comma
+   Nguyên nhân: dùng " bên trong xpath string
+   Fix: đổi attribute trong xpath thành dấu '
+
+5. Element bị che (click không được)
+   Nguyên nhân: element bị element khác phủ lên
+   Fix: thêm scroll trước khi tap
+        page.scroll_down() rồi wait_and_tap
+
+6. Test phụ thuộc nhau
+   Nguyên nhân: test sau cần state từ test trước
+   Fix: mỗi test TỰ điều hướng đến màn hình cần test
+        conftest.py đã reset về Home trước mỗi test
+
+7. ModuleNotFoundError: appium
+   Nguyên nhân: chưa cài trong .venv của PyCharm
+   Fix: pip install -r requirements.txt trong Terminal PyCharm
+
+--------------------------------------------------------
+## TEMPLATE TEST CASE CHUẨN
+--------------------------------------------------------
+
+import allure
+import time
+import pytest
+from pages.base_page import BasePage
+from locators.android_locators import AndroidHomeLocators, AndroidPlayerLocators
+
+@allure.feature("Tên màn hình")
+class TestTenManHinh:
+
+    @allure.story("Nhóm chức năng")
+    @allure.title("Mô tả ngắn gọn")
+    @pytest.mark.smoke  # hoặc regression
+    def test_ten_ro_rang(self, driver):
+        page = BasePage(driver)
+        # KHÔNG mở app ở đây — conftest.py đã lo
+
+        with allure.step("Bước 1: tên hành động"):
+            page.wait_and_tap(AndroidHomeLocators.TEN_LOCATOR)
+            time.sleep(1)  # chờ load nếu cần
+
+        with allure.step("Bước 2: kiểm tra kết quả"):
+            assert page.is_visible(AndroidHomeLocators.KET_QUA), \
+                "Thông báo lỗi rõ ràng khi assert fail"
+
+--------------------------------------------------------
+## LƯU Ý KHI VIẾT LOCATOR MỚI
+--------------------------------------------------------
+
+- Dùng Appium Inspector để lấy resource-id thật
+- Điền vào đúng class trong android_locators.py:
+  AndroidHomeLocators    → màn hình Home, ZingChart, bottom nav
+  AndroidSearchLocators  → màn hình tìm kiếm
+  AndroidPlayerLocators  → màn hình player
+  AndroidLoginLocators   → màn hình đăng nhập
+
+- Format chuẩn:
+  TEN_LOCATOR = ("id",    "com.zing.mp3:id/resource_id")
+  TEN_LOCATOR = ("xpath", "(//Widget[@resource-id='com.zing.mp3:id/id'])[index]")
+
+--------------------------------------------------------
+## LOGIN STATE — MARKERS BẮT BUỘC
+--------------------------------------------------------
+
+Mỗi test case PHẢI có đúng 1 hoặc nhiều login state marker.
+conftest.py tự động login/logout đúng tài khoản trước mỗi test.
+
+5 TRẠNG THÁI LOGIN:
+  @pytest.mark.non_login  → chưa đăng nhập
+  @pytest.mark.free       → tài khoản Free (có quảng cáo, không tải offline)
+  @pytest.mark.plus       → tài khoản Plus (không quảng cáo, không tải offline)
+  @pytest.mark.premium    → tài khoản Premium (full tính năng, tải offline)
+  @pytest.mark.offline    → không có mạng
+
+QUY TẮC CHỌN MARKER:
+- Test kiểm tra giới hạn của Non-login    → @pytest.mark.non_login
+- Test kiểm tra quảng cáo                → @pytest.mark.free
+- Test kiểm tra tải nhạc offline          → @pytest.mark.premium
+- Test chạy được cho mọi user đã login    → @pytest.mark.free + @pytest.mark.plus + @pytest.mark.premium
+- Test chạy được cho tất cả              → thêm cả @pytest.mark.non_login
+
+BẢNG QUYỀN TÍNH NĂNG:
+  Tính năng                | non_login | free | plus | premium
+  Xem danh sách / tìm kiếm | ✅        | ✅   | ✅   | ✅
+  Nghe thử 30 giây         | ✅        | —    | —    | —
+  Nghe full bài            | —         | ✅   | ✅   | ✅
+  Nghe không quảng cáo     | —         | —    | ✅   | ✅
+  Tạo playlist             | —         | ✅   | ✅   | ✅
+  Tải nhạc offline         | —         | —    | —    | ✅
+  Nghe lossless            | —         | —    | —    | ✅
+
+FORMAT BẮT BUỘC KHI VIẾT TEST:
+  @pytest.mark.LOGINSTATE         ← login state (bắt buộc)
+  @pytest.mark.smoke/regression   ← mức độ test (bắt buộc)
+  @allure.title("STATE: Mô tả")   ← title có tên state ở đầu
+
+VÍ DỤ ĐÚNG:
+  @pytest.mark.premium
+  @pytest.mark.smoke
+  @allure.title("Premium: Tải nhạc offline thành công")
+  def test_premium_download(self, driver):
+      ...
+
+  @pytest.mark.free
+  @pytest.mark.plus
+  @pytest.mark.regression
+  @allure.title("Free/Plus: Tạo playlist mới")
+  def test_create_playlist(self, driver):
+      ...
+
+  @pytest.mark.non_login
+  @pytest.mark.smoke
+  @allure.title("Non-login: Chỉ nghe thử 30 giây")
+  def test_preview_only(self, driver):
+      ...
+
+CÁCH CHẠY THEO TRẠNG THÁI:
+  pytest tests/ -m non_login --platform=android -v
+  pytest tests/ -m free --platform=android -v
+  pytest tests/ -m premium --platform=android -v
+  pytest tests/ -m "free or plus" --platform=android -v
+  pytest tests/ -m "smoke and premium" --platform=android -v
+
+--------------------------------------------------------
+## TEMPLATE TEST CASE ĐẦY ĐỦ VỚI LOGIN STATE
+--------------------------------------------------------
+
+import allure, time, pytest
+from pages.base_page import BasePage
+from locators.android_locators import AndroidHomeLocators
+
+@allure.feature("Tên màn hình")
+class TestTenManHinh:
+
+    @pytest.mark.LOGINSTATE        # non_login / free / plus / premium / offline
+    @pytest.mark.smoke             # smoke / regression
+    @allure.story("Nhóm chức năng")
+    @allure.title("LOGINSTATE: Mô tả test case ngắn gọn")
+    def test_ten_ro_rang(self, driver):
+        page = BasePage(driver)
+        # KHÔNG mở app, KHÔNG login/logout — conftest.py đã lo
+
+        with allure.step("Bước 1: thao tác"):
+            page.wait_and_tap(AndroidHomeLocators.TEN_LOCATOR)
+            time.sleep(1)
+
+        with allure.step("Bước 2: kiểm tra"):
+            assert page.is_visible(AndroidHomeLocators.KET_QUA), \
+                "Thông báo lỗi rõ ràng"
+
+========================================================
+END OF CONTEXT FILE
+========================================================
