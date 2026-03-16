@@ -10,15 +10,13 @@ ANDROID_CAPS = {
     "appPackage":          "com.zing.mp3",
     "appActivity":         "com.zing.mp3.ui.activity.MainScreenActivity",
     "automationName":      "UiAutomator2",
-    "noReset":             True,        # giữ dữ liệu giữa các lần chạy
-    "newCommandTimeout":   60,          # giảm từ 120 → 60s: phát hiện treo sớm hơn
-    "autoGrantPermissions": True,       # tự động cấp quyền app
+    "noReset":             True,
+    "newCommandTimeout":   60,
+    "autoGrantPermissions": True,
 
-    # ── Performance caps — giảm thời gian khởi động đáng kể ──────────────────
+    # ── Performance: giảm thời gian khởi động ────────────────────────────────
     "skipServerInstallation":   True,   # không cài lại Appium server mỗi lần
     "skipDeviceInitialization": True,   # không khởi tạo lại device
     "skipUnlock":               True,   # không unlock màn hình
     "disableWindowAnimation":   True,   # tắt animation → thao tác nhanh hơn
-
-    # ─────────────────────────────────────────────────────────────────────────
 }
