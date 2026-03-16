@@ -59,19 +59,26 @@ class BasePage:
     def wait_for_visible(self, locator, timeout=10):
         """Chờ element hiển thị trong vòng timeout giây"""
         by, value = locator
+        self.driver.implicitly_wait(0)  # tắt implicit wait để tránh xung đột với explicit wait
         try:
             return WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located((by, value))
             )
         except TimeoutException:
             raise TimeoutException(f"Element không hiển thị sau {timeout}s: {locator}")
+        finally:
+            self.driver.implicitly_wait(10)  # khôi phục
 
     def wait_for_clickable(self, locator, timeout=10):
         """Chờ element có thể click được"""
         by, value = locator
-        return WebDriverWait(self.driver, timeout).until(
-            EC.element_to_be_clickable((by, value))
-        )
+        self.driver.implicitly_wait(0)  # tắt implicit wait để tránh xung đột với explicit wait
+        try:
+            return WebDriverWait(self.driver, timeout).until(
+                EC.element_to_be_clickable((by, value))
+            )
+        finally:
+            self.driver.implicitly_wait(10)  # khôi phục
 
     def wait_and_tap(self, locator, timeout=10):
         """Chờ rồi nhấn"""

@@ -19,32 +19,31 @@ class TestHomeSwitchTab:
 
         with allure.step("Bước 1: Chuyển sang tab Tập trung"):
             page.wait_and_tap(AndroidHomeLocators.TAB_TAP_TRUNG)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 2: Chuyển sang tab Thư giãn"):
             page.wait_and_tap(AndroidHomeLocators.TAB_THU_GIAN)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 3: Chuyển sang tab Workout"):
             page.wait_and_tap(AndroidHomeLocators.TAB_WORKOUT)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 4: Chuyển sang tab Cho bạn"):
             page.wait_and_tap(AndroidHomeLocators.TAB_CHO_BAN)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 5: Chuyển sang tab Thư giãn"):
             page.wait_and_tap(AndroidHomeLocators.TAB_THU_GIAN)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 6: Chuyển sang tab Cho bạn"):
             page.wait_and_tap(AndroidHomeLocators.TAB_CHO_BAN)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 7: Chuyển sang tab Tập trung"):
             page.wait_and_tap(AndroidHomeLocators.TAB_TAP_TRUNG)
-            time.sleep(1)
+            time.sleep(0.3)
 
         with allure.step("Bước 8: Chuyển sang tab Cho bạn"):
             page.wait_and_tap(AndroidHomeLocators.TAB_CHO_BAN)
-            time.sleep(1)

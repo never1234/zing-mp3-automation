@@ -11,6 +11,6 @@ ANDROID_CAPS = {
     "appActivity":         ".ui.activity.SplashActivity",
     "automationName":      "UiAutomator2",
     "noReset":             True,       # giữ dữ liệu giữa các lần chạy
-    "newCommandTimeout":   60,
+    "newCommandTimeout":   120,
     "autoGrantPermissions": True       # tự động cấp quyền app
 }

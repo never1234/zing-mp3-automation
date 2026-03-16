@@ -7,6 +7,8 @@ from configs.android_config import ANDROID_CAPS
 from configs.ios_config import IOS_CAPS
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from locators.android_locators import AndroidHomeLocators
 
 load_dotenv()
@@ -66,12 +68,12 @@ def _navigate_to_home(driver):
     """Bring app to foreground and navigate to Khám phá home tab"""
     try:
         driver.activate_app("com.zing.mp3")
-        time.sleep(2)
+        # Đợi bottom nav hiển thị (xử lý cả SplashActivity) thay vì sleep cố định
         by, value = AndroidHomeLocators.BOTTOM_NAV_HOME
-        driver.find_element(by, value).click()
-        time.sleep(1)
-    except Exception:
-        pass
+        WebDriverWait(driver, 15).until(EC.visibility_of_element_located((by, value))).click()
+        time.sleep(0.5)
+    except Exception as e:
+        print(f"\n[WARN] _navigate_to_home failed: {e}")
 
 
 @pytest.fixture(scope="function", autouse=True)

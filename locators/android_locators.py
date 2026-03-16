@@ -27,9 +27,8 @@ class AndroidHomeLocators:
 
     # ── Bài hát đầu tiên trong section "Phát nhanh" ──────────────────────────
     QUICK_PLAY_FIRST_ITEM = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@text='Phát nhanh']"
-        "/parent::*/parent::*/following-sibling::*"
-        "//android.widget.ImageView)[1]")
+        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Phát nhanh']"
+        "/../following-sibling::android.widget.RelativeLayout[@clickable='true'])[1]")
 
     # ── Mini player ───────────────────────────────────────────────────────────
     MINI_PLAYER         = (AppiumBy.ID, "com.zing.mp3:id/playbarContainer")
@@ -72,19 +71,20 @@ class AndroidHomeLocators:
         "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and contains(@text,'Top 100')])[1]")
 
     # ── Màn hình Khám phá — Category Tabs ───────────────────────────────────
+    # //* tìm rvCategory (chỉ có 1 element với resource-id này), sau đó direct child /
     CATEGORY_TABS       = (AppiumBy.ID,   "com.zing.mp3:id/rvCategory")
     TAB_CHO_BAN         = (AppiumBy.XPATH,
         "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Cho bạn']")
+        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Cho bạn']")
     TAB_THU_GIAN        = (AppiumBy.XPATH,
         "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Thư giãn']")
+        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Thư giãn']")
     TAB_WORKOUT         = (AppiumBy.XPATH,
         "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Workout']")
+        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Workout']")
     TAB_TAP_TRUNG       = (AppiumBy.XPATH,
         "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Tập trung']")
+        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Tập trung']")
     NOTIFICATION_ICON   = (AppiumBy.ID,   "com.zing.mp3:id/ivIcon")
 
     # ── Màn hình Khám phá — Section "Dành riêng cho bạn" ────────────────────
