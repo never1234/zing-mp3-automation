@@ -1,4 +1,5 @@
 import os
+import time
 import pytest
 from appium import webdriver
 from dotenv import load_dotenv
@@ -6,6 +7,7 @@ from configs.android_config import ANDROID_CAPS
 from configs.ios_config import IOS_CAPS
 from appium.options.android import UiAutomator2Options
 from appium.options.ios import XCUITestOptions
+from locators.android_locators import AndroidHomeLocators
 
 load_dotenv()
 
@@ -20,6 +22,15 @@ def pytest_addoption(parser):
         help="Platform cần chạy test: android | ios"
     )
 
+def go_to_home(driver):
+    """Về Home nhanh hơn — nhấn thẳng tab thay vì back nhiều lần"""
+    try:
+        home_tab = driver.find_element("id", "com.zing.mp3:id/nav_home")
+        if home_tab.is_displayed():
+            home_tab.click()
+            time.sleep(0.5)  # giảm từ 1s → 0.5s
+    except:
+        pass
 
 @pytest.fixture(scope="session")
 def driver(request):
@@ -51,6 +62,25 @@ def driver(request):
     driver.quit()
 
 
+def _navigate_to_home(driver):
+    """Bring app to foreground and navigate to Khám phá home tab"""
+    try:
+        driver.activate_app("com.zing.mp3")
+        time.sleep(2)
+        by, value = AndroidHomeLocators.BOTTOM_NAV_HOME
+        driver.find_element(by, value).click()
+        time.sleep(1)
+    except Exception:
+        pass
+
+
+@pytest.fixture(scope="function", autouse=True)
+def reset_to_home(driver):
+    """Điều hướng về màn hình Home (tab Khám phá) trước mỗi test"""
+    _navigate_to_home(driver)
+    yield
+
+
 @pytest.fixture(scope="function", autouse=True)
 def screenshot_on_failure(request, driver):
     """Tự động chụp màn hình khi test FAIL"""
@@ -74,3 +104,21 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     rep = outcome.get_result()
     setattr(item, "rep_" + rep.when, rep)
+
+    ANDROID_CAPS = {
+        "platformName": "Android",
+        "deviceName": os.getenv("ANDROID_DEVICE", "RFCX309KX8Z"),
+        "appPackage": "com.zing.mp3",
+        "appActivity": "com.zing.mp3.ui.activity.MainScreenActivity",
+        "automationName": "UiAutomator2",
+        "noReset": True,
+        "newCommandTimeout": 120,
+        "autoGrantPermissions": True,
+
+        # ── THÊM 4 DÒNG NÀY — giảm thời gian START ──────
+        "skipServerInstallation": True,  # không cài lại server mỗi lần
+        "skipDeviceInitialization": True,  # không khởi tạo device lại
+        "skipUnlock": True,  # không unlock màn hình
+        "disableWindowAnimation": True,  # tắt animation trong Appium
+        # ─────────────────────────────────────────────────
+    }
