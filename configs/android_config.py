@@ -11,7 +11,7 @@ ANDROID_CAPS = {
     "appActivity":         "com.zing.mp3.ui.activity.MainScreenActivity",
     "automationName":      "UiAutomator2",
     "noReset":             True,        # giữ dữ liệu giữa các lần chạy
-    "newCommandTimeout":   120,
+    "newCommandTimeout":   60,          # giảm từ 120 → 60s: phát hiện treo sớm hơn
     "autoGrantPermissions": True,       # tự động cấp quyền app
 
     # ── Performance caps — giảm thời gian khởi động đáng kể ──────────────────
@@ -19,5 +19,6 @@ ANDROID_CAPS = {
     "skipDeviceInitialization": True,   # không khởi tạo lại device
     "skipUnlock":               True,   # không unlock màn hình
     "disableWindowAnimation":   True,   # tắt animation → thao tác nhanh hơn
+
     # ─────────────────────────────────────────────────────────────────────────
 }

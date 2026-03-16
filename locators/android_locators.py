@@ -4,28 +4,36 @@ from appium.webdriver.common.appiumby import AppiumBy
 
 class AndroidHomeLocators:
     # ── Bottom navigation tabs ────────────────────────────────────────────────
-    BOTTOM_NAV_LIBRARY = (AppiumBy.XPATH, "//android.widget.FrameLayout[@resource-id='com.zing.mp3:id/bnv']/android.widget.FrameLayout[1]")
-    BOTTOM_NAV_HOME    = (AppiumBy.XPATH, "//android.widget.FrameLayout[@resource-id='com.zing.mp3:id/bnv']/android.widget.FrameLayout[2]")
-    BOTTOM_NAV_CHART   = (AppiumBy.XPATH, "//android.widget.FrameLayout[@resource-id='com.zing.mp3:id/bnv']/android.widget.FrameLayout[3]")
-    BOTTOM_NAV_RADIO   = (AppiumBy.XPATH, "//android.widget.FrameLayout[@resource-id='com.zing.mp3:id/bnv']/android.widget.FrameLayout[4]")
-    BOTTOM_NAV_PROFILE = (AppiumBy.XPATH, "//android.widget.FrameLayout[@resource-id='com.zing.mp3:id/bnv']/android.widget.FrameLayout[5]")
+    # Dùng ANDROID_UIAUTOMATOR: childSelector + instance() nhanh hơn XPATH //...[@resource-id]/[n]
+    BOTTOM_NAV_LIBRARY = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Thư viện")')
+    BOTTOM_NAV_HOME    = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Khám phá")')
+    BOTTOM_NAV_CHART   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("#zingchart")')
+    BOTTOM_NAV_RADIO   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Phòng nhạc")')
+    BOTTOM_NAV_PROFILE = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Cá nhân")')
 
     # ── Bottom Navigation — nhãn tab ─────────────────────────────────────────
-    BOTTOM_NAV_LABEL_THU_VIEN   = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvLabel' and @text='Thư viện']")
-    BOTTOM_NAV_LABEL_KHAM_PHA   = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvLabel' and @text='Khám phá']")
-    BOTTOM_NAV_LABEL_ZINGCHART  = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvLabel' and @text='#zingchart']")
-    BOTTOM_NAV_LABEL_PHONG_NHAC = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvLabel' and @text='Phòng nhạc']")
-    BOTTOM_NAV_LABEL_CA_NHAN    = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvLabel' and @text='Cá nhân']")
+    BOTTOM_NAV_LABEL_THU_VIEN   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Thư viện")')
+    BOTTOM_NAV_LABEL_KHAM_PHA   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Khám phá")')
+    BOTTOM_NAV_LABEL_ZINGCHART  = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("#zingchart")')
+    BOTTOM_NAV_LABEL_PHONG_NHAC = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Phòng nhạc")')
+    BOTTOM_NAV_LABEL_CA_NHAN    = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvLabel").text("Cá nhân")')
 
     # ── Nút tìm kiếm trên header màn hình Khám phá ───────────────────────────
     SEARCH_BUTTON      = (AppiumBy.ID, "com.zing.mp3:id/search")
 
     # ── Bài hát đầu tiên trong section "Phát nhanh" ──────────────────────────
+    # TODO: Nếu biết resource-id của item "Phát nhanh", thay bằng ANDROID_UIAUTOMATOR
+    # để tránh following-sibling:: axis (chậm). Cần kiểm tra UI tree bằng Appium Inspector.
     QUICK_PLAY_FIRST_ITEM = (AppiumBy.XPATH,
         "(//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Phát nhanh']"
         "/../following-sibling::android.widget.RelativeLayout[@clickable='true'])[1]")
@@ -45,51 +53,47 @@ class AndroidHomeLocators:
     BOTTOM_SHEET_OUTSIDE = (AppiumBy.ID, "com.zing.mp3:id/touch_outside")
 
     # ── Màn hình Khám phá — Header ───────────────────────────────────────────
-    PAGE_TITLE          = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Khám phá']")
+    PAGE_TITLE          = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/text").text("Khám phá")')
 
     # ── Màn hình Khám phá — Section "Phát nhanh" ────────────────────────────
-    SECTION_PHAT_NHANH  = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Phát nhanh']")
-    TOP100_PLAYLIST_FIRST = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle'])[1]")
+    SECTION_PHAT_NHANH  = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/text").text("Phát nhanh")')
+    TOP100_PLAYLIST_FIRST = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").instance(0)')
 
     # ── Màn hình Khám phá — Section "Gợi ý bài hát" ─────────────────────────
-    SECTION_GOI_Y_BAI_HAT = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Gợi ý bài hát']")
-    BTN_PHAT_TAT_CA     = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvPlay' and @text='Phát tất cả']")
-    SONG_TITLE_IN_LIST  = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle'])[2]")
-    SONG_ARTIST_IN_LIST = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvArtist'])[1]")
+    SECTION_GOI_Y_BAI_HAT = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Gợi ý bài hát")')
+    BTN_PHAT_TAT_CA     = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvPlay").text("Phát tất cả")')
+    SONG_TITLE_IN_LIST  = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").instance(1)')
+    SONG_ARTIST_IN_LIST = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvArtist").instance(0)')
 
     # ── Màn hình Khám phá — Section "Top 100" ───────────────────────────────
-    SECTION_TOP_100     = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Top 100']")
-    TOP100_ITEM_TITLE   = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and contains(@text,'Top 100')])[1]")
+    SECTION_TOP_100     = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/text").text("Top 100")')
+    TOP100_ITEM_TITLE   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").textContains("Top 100").instance(0)')
 
     # ── Màn hình Khám phá — Category Tabs ───────────────────────────────────
-    # //* tìm rvCategory (chỉ có 1 element với resource-id này), sau đó direct child /
+    # Dùng ANDROID_UIAUTOMATOR thay XPATH để tránh full-tree traversal (//*) — nhanh hơn ~10-20x
     CATEGORY_TABS       = (AppiumBy.ID,   "com.zing.mp3:id/rvCategory")
-    TAB_CHO_BAN         = (AppiumBy.XPATH,
-        "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Cho bạn']")
-    TAB_THU_GIAN        = (AppiumBy.XPATH,
-        "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Thư giãn']")
-    TAB_WORKOUT         = (AppiumBy.XPATH,
-        "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Workout']")
-    TAB_TAP_TRUNG       = (AppiumBy.XPATH,
-        "//*[@resource-id='com.zing.mp3:id/rvCategory']"
-        "/android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle' and @text='Tập trung']")
+    TAB_CHO_BAN         = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Cho bạn")')
+    TAB_THU_GIAN        = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Thư giãn")')
+    TAB_WORKOUT         = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Workout")')
+    TAB_TAP_TRUNG       = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Tập trung")')
     NOTIFICATION_ICON   = (AppiumBy.ID,   "com.zing.mp3:id/ivIcon")
 
     # ── Màn hình Khám phá — Section "Dành riêng cho bạn" ────────────────────
-    SECTION_DANH_RIENG  = (AppiumBy.XPATH,
-        "//android.widget.TextView[@text='Dành riêng cho bạn']")
+    SECTION_DANH_RIENG  = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().text("Dành riêng cho bạn")')
     BTN_REFRESH         = (AppiumBy.ID,   "com.zing.mp3:id/btnRefresh")
     BTN_REFRESH_VIEW    = (AppiumBy.ID,   "com.zing.mp3:id/btnRefreshView")
 
@@ -117,9 +121,9 @@ class AndroidSearchLocators:
     SEARCH_LAYOUT       = (AppiumBy.ID,   "com.zing.mp3:id/searchLayout")
 
     # ── Kết quả tìm kiếm ─────────────────────────────────────────────────────
-    FIRST_SONG_RESULT   = (AppiumBy.XPATH,
-        "(//androidx.recyclerview.widget.RecyclerView//android.widget.TextView"
-        "[@resource-id='com.zing.mp3:id/tvTitle'])[1]")
+    # Đã loại bỏ double-// descendant traversal, dùng resourceId + instance trực tiếp
+    FIRST_SONG_RESULT   = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").instance(0)')
     SONG_LIST           = (AppiumBy.ID,   "com.zing.mp3:id/recyclerView")
     NO_RESULT_TEXT      = (AppiumBy.ID,   "com.zing.mp3:id/tvEmpty")
 
@@ -260,12 +264,12 @@ class AndroidPlaylistLocators:
 
     # ── Danh sách bài hát ────────────────────────────────────────────────────
     SONG_LIST            = (AppiumBy.ID, "com.zing.mp3:id/recyclerView")
-    FIRST_SONG_TITLE     = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle'])[1]")
-    FIRST_SONG_ARTIST    = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvArtist'])[1]")
-    FIRST_SONG_MENU_BTN  = (AppiumBy.XPATH,
-        "(//android.widget.ImageButton[@resource-id='com.zing.mp3:id/btnMenu'])[1]")
+    FIRST_SONG_TITLE     = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").instance(0)')
+    FIRST_SONG_ARTIST    = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvArtist").instance(0)')
+    FIRST_SONG_MENU_BTN  = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/btnMenu").instance(0)')
     DOWNLOAD_INDICATOR   = (AppiumBy.ID, "com.zing.mp3:id/downloadIndicator")
 
     # ── CTA header / promotion ────────────────────────────────────────────────
@@ -274,8 +278,8 @@ class AndroidPlaylistLocators:
 
 class AndroidProfileLocators:
     # ── Header ───────────────────────────────────────────────────────────────
-    PAGE_TITLE           = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Cá nhân']")
+    PAGE_TITLE           = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/text").text("Cá nhân")')
     AVATAR               = (AppiumBy.ID, "com.zing.mp3:id/imgAvatar")
     BG_IMAGE             = (AppiumBy.ID, "com.zing.mp3:id/imgBg")
     IV_BADGE             = (AppiumBy.ID, "com.zing.mp3:id/ivBadge")
@@ -317,15 +321,16 @@ class AndroidChartLocators:
     BTN_FAST_PLAY        = (AppiumBy.ID,   "com.zing.mp3:id/btnFastPlay")      # "Phát nhanh"
 
     # ── Danh sách bài hát chart ───────────────────────────────────────────────
-    CHART_TOP1_ROW       = (AppiumBy.XPATH,
-        "//android.widget.TextView[@resource-id='com.zing.mp3:id/tvRank' and @text='1']"
-        "/ancestor::android.widget.LinearLayout[@clickable='true']")
-    CHART_TOP1_THUMB     = (AppiumBy.XPATH,
-        "(//android.widget.ImageView[@resource-id='com.zing.mp3:id/imgThumb'])[1]")
-    CHART_TOP1_TITLE     = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvTitle'])[1]")
-    CHART_TOP1_ARTIST    = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@resource-id='com.zing.mp3:id/tvArtist'])[1]")
+    # CHART_TOP1_ROW: thay ancestor:: axis (rất chậm) bằng childSelector native
+    CHART_TOP1_ROW       = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().className("android.widget.LinearLayout").clickable(true)'
+        '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvRank").text("1"))')
+    CHART_TOP1_THUMB     = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/imgThumb").instance(0)')
+    CHART_TOP1_TITLE     = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").instance(0)')
+    CHART_TOP1_ARTIST    = (AppiumBy.ANDROID_UIAUTOMATOR,
+        'new UiSelector().resourceId("com.zing.mp3:id/tvArtist").instance(0)')
     CHART_RANK           = (AppiumBy.ID,   "com.zing.mp3:id/tvRank")
     CHART_CHANGE         = (AppiumBy.ID,   "com.zing.mp3:id/tvChange")
     CHART_SONG_LIST      = (AppiumBy.ID,   "com.zing.mp3:id/recyclerView")

@@ -1,4 +1,5 @@
 import os
+import subprocess
 import time
 import pytest
 from appium import webdriver
@@ -25,11 +26,28 @@ def pytest_addoption(parser):
     )
 
 
+def _cleanup_uiautomator2():
+    """Kill UiAutomator2 server còn sót trên device để tránh session conflict"""
+    for pkg in (
+        "io.appium.uiautomator2.server",
+        "io.appium.uiautomator2.server.test",
+    ):
+        try:
+            subprocess.run(
+                ["adb", "shell", "am", "force-stop", pkg],
+                timeout=5, capture_output=True
+            )
+        except Exception:
+            pass
+
+
 @pytest.fixture(scope="session")
 def driver(request):
     """
-    Khởi động Appium driver theo platform được chọn
-    Dùng chung cho toàn bộ test session
+    Khởi động Appium driver theo platform được chọn.
+    Dùng chung cho toàn bộ test session.
+    Không kill UiAutomator2 trước session — để Appium reuse server đang chạy (nhanh hơn).
+    Nếu bị kẹt session cũ: chạy cleanup.bat thủ công rồi chạy lại.
     """
     platform = request.config.getoption("--platform")
     os.environ["PLATFORM"] = platform  # Truyền vào BasePage
@@ -43,22 +61,36 @@ def driver(request):
 
     print(f"\n[START] Khoi dong {platform.upper()} driver...")
 
-    driver = webdriver.Remote(command_executor=appium_server, options=options)
+    drv = webdriver.Remote(command_executor=appium_server, options=options)
     # implicitly_wait(0) để tránh double-wait với explicit WebDriverWait
-    driver.implicitly_wait(0)
+    drv.implicitly_wait(0)
 
-    yield driver
+    yield drv
 
     print(f"\n[STOP] Dong {platform.upper()} driver...")
-    driver.quit()
+    try:
+        drv.quit()
+    except Exception:
+        pass
+
+    # Dọn sau khi session kết thúc — tránh zombie process cho lần chạy sau
+    if platform == "android":
+        _cleanup_uiautomator2()
 
 
 def _navigate_to_home(driver):
-    """Về màn hình Khám phá (Home tab) — dùng explicit wait thay vì sleep cứng"""
+    """Về màn hình Khám phá (Home tab) — đảm bảo app ở foreground trước"""
+    # Nếu app không ở foreground (đang ở launcher / màn hình khác) → kéo lên
     try:
-        by, value = AndroidHomeLocators.BOTTOM_NAV_HOME
-        WebDriverWait(driver, 5).until(
-            EC.element_to_be_clickable((by, value))
+        if driver.current_package != "com.zing.mp3":
+            driver.activate_app("com.zing.mp3")
+    except Exception:
+        pass
+
+    try:
+        by, value = AndroidHomeLocators.BOTTOM_NAV_LABEL_KHAM_PHA
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((by, value))
         ).click()
     except Exception:
         pass
