@@ -43,6 +43,10 @@ def driver(request):
     options = UiAutomator2Options().load_capabilities(ANDROID_CAPS) \
         if platform == "android" else XCUITestOptions().load_capabilities(IOS_CAPS)
 
+    # Dọn UiAutomator2 cũ trước khi tạo session — bắt buộc sau khi server bị crash
+    if platform == "android":
+        _cleanup_uiautomator2()
+
     print(f"\n[START] Khoi dong {platform.upper()} driver...")
     drv = webdriver.Remote(command_executor=appium_server, options=options)
     drv.implicitly_wait(0)  # tắt implicit wait — tránh double-wait với WebDriverWait
