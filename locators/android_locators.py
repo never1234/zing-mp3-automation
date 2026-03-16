@@ -79,15 +79,19 @@ class AndroidHomeLocators:
 
     # ── Màn hình Khám phá — Category Tabs ───────────────────────────────────
     CATEGORY_TABS       = (AppiumBy.ID,   "com.zing.mp3:id/rvCategory")
-    # Flat selector thay vì //*[@resource-id]//... — tránh full-tree traversal
+    # childSelector scoped vào rvCategory — tránh crash UiAutomator2 do tvTitle match quá nhiều element
     TAB_CHO_BAN         = (AppiumBy.ANDROID_UIAUTOMATOR,
-        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Cho bạn")')
+        'new UiSelector().resourceId("com.zing.mp3:id/rvCategory")'
+        '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Cho bạn"))')
     TAB_THU_GIAN        = (AppiumBy.ANDROID_UIAUTOMATOR,
-        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Thư giãn")')
+        'new UiSelector().resourceId("com.zing.mp3:id/rvCategory")'
+        '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Thư giãn"))')
     TAB_WORKOUT         = (AppiumBy.ANDROID_UIAUTOMATOR,
-        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Workout")')
+        'new UiSelector().resourceId("com.zing.mp3:id/rvCategory")'
+        '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Workout"))')
     TAB_TAP_TRUNG       = (AppiumBy.ANDROID_UIAUTOMATOR,
-        'new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Tập trung")')
+        'new UiSelector().resourceId("com.zing.mp3:id/rvCategory")'
+        '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Tập trung"))')
     NOTIFICATION_ICON   = (AppiumBy.ID,   "com.zing.mp3:id/ivIcon")
 
     # ── Màn hình Khám phá — Section "Dành riêng cho bạn" ────────────────────

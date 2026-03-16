@@ -89,8 +89,11 @@ def screenshot_on_failure(request, driver):
         screenshot_dir = "reports/screenshots"
         os.makedirs(screenshot_dir, exist_ok=True)
         path = f"{screenshot_dir}/{test_name}.png"
-        driver.save_screenshot(path)
-        print(f"\n[SCREENSHOT] Da luu tai: {path}")
+        try:
+            driver.save_screenshot(path)
+            print(f"\n[SCREENSHOT] Da luu tai: {path}")
+        except Exception:
+            pass
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
