@@ -63,7 +63,10 @@ def driver(request):
 
 
 def _navigate_to_home(driver):
-    """Về tab Khám phá — chỉ activate_app khi app không ở foreground"""
+    """Về tab Khám phá — dismiss overlay/ads trước, rồi navigate"""
+    from pages.base_page import BasePage
+    BasePage(driver).dismiss_player_overlays()
+
     try:
         if driver.current_package != "com.zing.mp3":
             driver.activate_app("com.zing.mp3")

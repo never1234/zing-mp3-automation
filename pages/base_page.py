@@ -47,10 +47,18 @@ class BasePage:
         return self.find(locator).text
 
     def is_visible(self, locator):
-        """Kiểm tra element có hiển thị không"""
+        """Kiểm tra element có hiển thị không (không chờ)"""
         try:
             return self.find(locator).is_displayed()
         except (NoSuchElementException, Exception):
+            return False
+
+    def is_visible_with_wait(self, locator, timeout=5):
+        """Chờ tối đa timeout giây rồi trả về True/False — tránh false-negative sau screen transition"""
+        try:
+            self.wait_for_visible(locator, timeout)
+            return True
+        except TimeoutException:
             return False
 
     # --------------------------------------------------
@@ -101,6 +109,46 @@ class BasePage:
             end_x=width // 2,   end_y=int(height * 0.7),
             duration=500
         )
+
+    # --------------------------------------------------
+    # Auto-dismiss Player overlays
+    # --------------------------------------------------
+    def dismiss_player_overlays(self):
+        """Tự động đóng các dialog/popup/ads trong màn hình Player (nếu có).
+        An toàn để gọi bất kỳ lúc nào — không raise nếu không có overlay.
+
+        Handles:
+        - Reward Ads overlay (Ads-Reward): layoutCountdown + btnCta
+        - Lossless BTS (Player-Bts-Lossless): design_bottom_sheet + btnNegative "ĐỂ SAU"
+        - Promotion popup: btnNegative "Không phải bây giờ" / "Bỏ qua"
+        """
+        from locators.android_locators import AndroidPlayerLocators, AndroidHomeLocators
+
+        # 1. Reward Ads overlay — chặn Player khi non-premium trigger reward ad
+        if self.is_visible(AndroidPlayerLocators.ADS_REWARD_LAYOUT):
+            try:
+                self.tap(AndroidPlayerLocators.ADS_REWARD_CTA_BTN)
+            except Exception:
+                pass
+
+        # 2. Lossless BTS + Promotion popup — cùng dùng btnNegative để dismiss
+        if self.is_visible(AndroidHomeLocators.POPUP_SKIP_BTN):
+            try:
+                self.tap(AndroidHomeLocators.POPUP_SKIP_BTN)
+            except Exception:
+                pass
+
+    def dismiss_app_theme_sheet(self):
+        """Đóng bottom sheet 'Chọn chủ đề' (App Theme) nếu đang hiển thị.
+        Chờ tối đa 3 giây để sheet xuất hiện (tránh bỏ sót khi sheet load chậm).
+        An toàn để gọi bất kỳ lúc nào — không raise nếu sheet không xuất hiện.
+        """
+        from locators.android_locators import AndroidPlayerLocators
+        if self.is_visible_with_wait(AndroidPlayerLocators.BTS_APP_THEME_TITLE, timeout=3):
+            try:
+                self.tap(AndroidPlayerLocators.BTS_APP_THEME_CLOSE)
+            except Exception:
+                pass
 
     # --------------------------------------------------
     # Chụp màn hình khi lỗi

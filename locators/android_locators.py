@@ -32,10 +32,10 @@ class AndroidHomeLocators:
     SEARCH_BUTTON      = (AppiumBy.ID, "com.zing.mp3:id/search")
 
     # ── Bài hát đầu tiên trong section "Phát nhanh" ──────────────────────────
+    # Dùng viewPager resource-id thay vì parent/following-sibling XPath — nhanh hơn ~10x trên real device
     QUICK_PLAY_FIRST_ITEM = (AppiumBy.XPATH,
-        "(//android.widget.TextView[@text='Phát nhanh']"
-        "/parent::*/parent::*/following-sibling::*"
-        "//android.widget.ImageView)[1]")
+        "(//androidx.viewpager.widget.ViewPager[@resource-id='com.zing.mp3:id/viewPager']"
+        "//android.widget.RelativeLayout[@clickable='true'])[1]")
 
     # ── Mini player ───────────────────────────────────────────────────────────
     MINI_PLAYER         = (AppiumBy.ID, "com.zing.mp3:id/playbarContainer")
@@ -233,6 +233,23 @@ class AndroidPlayerLocators:
 
     # ── Reward Ads button ─────────────────────────────────────────────────────
     BTN_REWARD_ADS       = (AppiumBy.ID, "com.zing.mp3:id/btnRewardAds")
+
+    # ── Reward Ads overlay (Ads-Reward scene) ────────────────────────────────
+    # Xuất hiện khi user non-premium trigger reward ad — chặn toàn bộ Player UI
+    ADS_REWARD_LAYOUT    = (AppiumBy.ID, "com.zing.mp3:id/layoutCountdown")
+    ADS_REWARD_CTA_BTN   = (AppiumBy.ID, "com.zing.mp3:id/btnCta")
+
+    # ── Lossless quality bottom sheet (Bts-Lossless scene) ───────────────────
+    # Xuất hiện với Free/Plus khi mở bài có Lossless — hỏi có muốn nghe thử không
+    BTS_LOSSLESS_LAYOUT  = (AppiumBy.ID, "com.zing.mp3:id/design_bottom_sheet")
+    BTS_LOSSLESS_TRY     = (AppiumBy.ID, "com.zing.mp3:id/btnPrimary")    # "NGHE THỬ LOSSLESS"
+    BTS_LOSSLESS_LATER   = (AppiumBy.ID, "com.zing.mp3:id/btnNegative")   # "ĐỂ SAU"
+
+    # ── App Theme bottom sheet (Bts-AppTheme scene) ───────────────────────
+    # Xuất hiện khi app gợi ý chọn chủ đề giao diện — title "Chọn chủ đề" + nút X
+    BTS_APP_THEME_TITLE  = (AppiumBy.XPATH,
+        "//android.widget.TextView[@resource-id='com.zing.mp3:id/title' and @text='Chọn chủ đề']")
+    BTS_APP_THEME_CLOSE  = (AppiumBy.ID, "com.zing.mp3:id/btnClose")
 
     # ── Download bottom sheet ─────────────────────────────────────────────────
     DOWNLOAD_BTN         = (AppiumBy.ID, "com.zing.mp3:id/btnDownload")
