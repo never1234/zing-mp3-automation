@@ -37,6 +37,11 @@ class AndroidHomeLocators:
         "(//androidx.viewpager.widget.ViewPager[@resource-id='com.zing.mp3:id/viewPager']"
         "//android.widget.RelativeLayout[@clickable='true'])[1]")
 
+    # ── Tất cả item trong section "Phát nhanh" (dùng cho random pick) ────────
+    QUICK_PLAY_ALL_ITEMS  = (AppiumBy.XPATH,
+        "//android.widget.TextView[@resource-id='com.zing.mp3:id/text' and @text='Phát nhanh']"
+        "/../following-sibling::android.widget.RelativeLayout[@clickable='true']")
+
     # ── Mini player ───────────────────────────────────────────────────────────
     MINI_PLAYER         = (AppiumBy.ID, "com.zing.mp3:id/playbarContainer")
     MINI_PLAYER_PLAY_PAUSE = (AppiumBy.ID, "com.zing.mp3:id/btnPlayPause")
