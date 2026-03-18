@@ -63,20 +63,36 @@ def driver(request):
 
 
 def _navigate_to_home(driver):
-    """Về tab Khám phá — dismiss overlay/ads trước, rồi navigate"""
+    """Về tab Khám phá: activate app → minimize player → dismiss overlays → navigate"""
     from pages.base_page import BasePage
-    BasePage(driver).dismiss_player_overlays()
+    from locators.android_locators import AndroidPlayerLocators
 
+    page = BasePage(driver)
+
+    # 1. Đảm bảo app đang ở foreground trước khi làm bất cứ điều gì
     try:
         if driver.current_package != "com.zing.mp3":
             driver.activate_app("com.zing.mp3")
     except Exception:
         pass
 
+    # 2. Minimize full Player nếu đang mở (che khuất bottom nav)
+    # Dùng PLAY_PAUSE_BTN (com.zing.mp3:id/btnPlay) — chỉ tồn tại trên full Player,
+    # khác với mini player dùng btnPlayPause
+    if page.is_visible(AndroidPlayerLocators.PLAY_PAUSE_BTN):
+        try:
+            page.minimize_player()
+        except Exception:
+            pass
+
+    # 3. Dismiss overlay/ads sau khi app đã ở foreground
+    page.dismiss_player_overlays()
+
+    # 4. Tap tab Khám phá — dùng element_to_be_clickable tránh click trên element chưa sẵn sàng
     try:
         by, value = AndroidHomeLocators.BOTTOM_NAV_HOME
         WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((by, value))
+            EC.element_to_be_clickable((by, value))
         ).click()
     except Exception:
         pass

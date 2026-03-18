@@ -55,7 +55,7 @@ class PlayerPage(BasePage):
 
     def tap_minimize(self):
         """Gập player xuống thành mini player"""
-        self.wait_and_tap(self.loc.MINIMIZE_BTN)
+        self.minimize_player()
 
     # --------------------------------------------------
     # Trạng thái

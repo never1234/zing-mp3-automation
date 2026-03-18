@@ -131,32 +131,75 @@ CÁC LỖI HAY GẶP VÀ CÁCH TRÁNH:
    Fix: pip install -r requirements.txt trong Terminal PyCharm
 
 --------------------------------------------------------
-## TEMPLATE TEST CASE CHUẨN
+## 9.5 BUGS ĐÃ FIX — KHÔNG LÀM LẠI
 --------------------------------------------------------
 
-import allure
-import time
-import pytest
-from pages.base_page import BasePage
-from locators.android_locators import AndroidHomeLocators, AndroidPlayerLocators
+BUG 1: Session init bị treo (hang) sau khi UiAutomator2 crash
+   Triệu chứng: webdriver.Remote() treo mãi không tạo được session
+   Nguyên nhân: UiAutomator2 server còn sót từ lần crash trước
+   Fix đã áp dụng: conftest.py gọi _cleanup_uiautomator2() trước VÀ sau session
+     → force-stop cả "io.appium.uiautomator2.server" và ".server.test"
+   KHÔNG xóa hoặc bỏ qua _cleanup_uiautomator2() call trong conftest.py
 
-@allure.feature("Tên màn hình")
-class TestTenManHinh:
+BUG 2: Test chạy chậm (~10-20 giây/bước) trên real device
+   Nguyên nhân gốc:
+   a) driver.implicitly_wait(10) → gây double-wait 10s mỗi lần find_element thất bại
+   b) appActivity = SplashActivity → mỗi session phải chờ splash screen
+   c) BOTTOM_NAV_* dùng XPATH FrameLayout → is_enabled()=false → element_to_be_clickable luôn timeout
+   Fix đã áp dụng:
+   - implicitly_wait(0) — KHÔNG đổi lại về giá trị khác
+   - appActivity = MainScreenActivity — KHÔNG dùng SplashActivity
+   - BOTTOM_NAV_* dùng ANDROID_UIAUTOMATOR tvLabel.text() — KHÔNG dùng XPATH FrameLayout
+   - Performance caps trong android_config.py: skipServerInstallation, skipDeviceInitialization,
+     skipUnlock, disableWindowAnimation
 
-    @allure.story("Nhóm chức năng")
-    @allure.title("Mô tả ngắn gọn")
-    @pytest.mark.smoke  # hoặc regression
-    def test_ten_ro_rang(self, driver):
-        page = BasePage(driver)
-        # KHÔNG mở app ở đây — conftest.py đã lo
+BUG 3: UiAutomator2 crash / socket hang up khi tap Category Tab
+   Triệu chứng: instrumentation OOM crash, socket hang up
+   Nguyên nhân: flat tvTitle.text() selector khớp hàng chục element bài hát/playlist trên màn hình
+   Fix đã áp dụng: TAB_* dùng childSelector scoped vào rvCategory
+     → chỉ tìm trong 4 tab, không scan toàn bộ UI tree
+   VÍ DỤ ĐÚNG:
+     TAB_CHO_BAN = (AppiumBy.ANDROID_UIAUTOMATOR,
+         'new UiSelector().resourceId("com.zing.mp3:id/rvCategory")'
+         '.childSelector(new UiSelector().resourceId("com.zing.mp3:id/tvTitle").text("Cho bạn"))')
+   KHÔNG dùng: UiSelector().text("Cho bạn") không có childSelector → crash
 
-        with allure.step("Bước 1: tên hành động"):
-            page.wait_and_tap(AndroidHomeLocators.TEN_LOCATOR)
-            time.sleep(1)  # chờ load nếu cần
+BUG 4: Bottom nav click fail sau khi Player đang mở
+   Triệu chứng: reset_to_home không điều hướng được → test tiếp theo fail ngay bước đầu
+   Nguyên nhân: full Player che khuất bottom nav, presence_of_element_located pass nhưng click không có tác dụng
+   Fix đã áp dụng trong _navigate_to_home():
+     1. activate_app() — đảm bảo app ở foreground
+     2. Minimize full Player nếu đang mở (kiểm tra PLAY_PAUSE_BTN = btnPlay)
+     3. dismiss_player_overlays()
+     4. WebDriverWait element_to_be_clickable (KHÔNG dùng presence_of_element_located)
+   KHÔNG đổi lại về presence_of_element_located
 
-        with allure.step("Bước 2: kiểm tra kết quả"):
-            assert page.is_visible(AndroidHomeLocators.KET_QUA), \
-                "Thông báo lỗi rõ ràng khi assert fail"
+BUG 5: minimize_player() dùng ACCESSIBILITY_ID "Di chuyển lên" — unreliable
+   Triệu chứng: tap MINIMIZE_BTN đôi khi không có tác dụng (accessibility label thay đổi theo theme)
+   Fix đã áp dụng: minimize_player() trong BasePage dùng driver.back()
+   KHÔNG dùng wait_and_tap(AndroidPlayerLocators.MINIMIZE_BTN) để minimize player
+
+BUG 6: dismiss_player_overlays() bỏ sót popup xuất hiện muộn
+   Triệu chứng: POPUP_SKIP_BTN (btnNegative) có nhưng is_visible() trả False vì sheet chưa render xong
+   Fix đã áp dụng: dùng is_visible_with_wait(POPUP_SKIP_BTN, timeout=5) thay vì is_visible()
+   KHÔNG dùng is_visible() (không có wait) để check popup trong dismiss_player_overlays()
+
+--------------------------------------------------------
+## 9.6 QUY TẮC LOCATOR — PHÂN BIỆT FULL PLAYER vs MINI PLAYER
+--------------------------------------------------------
+
+FULL PLAYER (màn hình phát nhạc đầy đủ):
+  PLAY_PAUSE_BTN = ("id", "com.zing.mp3:id/btnPlay")        ← tên resource-id là "btnPlay"
+  MINIMIZE_BTN   = ("accessibility id", "Di chuyển lên")    ← KHÔNG dùng, dùng driver.back() thay thế
+
+MINI PLAYER (thanh nhỏ ở bottom):
+  MINI_PLAYER           = ("id", "com.zing.mp3:id/playbarContainer")
+  MINI_PLAYER_PLAY_PAUSE = ("id", "com.zing.mp3:id/btnPlayPause")  ← tên resource-id là "btnPlayPause"
+
+PHÂN BIỆT:
+  - Full Player đang mở ↔ page.is_visible(AndroidPlayerLocators.PLAY_PAUSE_BTN) trả True
+  - "btnPlay" chỉ tồn tại trên full Player — dùng để detect xem full Player có đang hiển thị không
+  - "btnPlayPause" chỉ tồn tại trên mini player — dùng để tap play/pause từ mini player
 
 --------------------------------------------------------
 ## LƯU Ý KHI VIẾT LOCATOR MỚI

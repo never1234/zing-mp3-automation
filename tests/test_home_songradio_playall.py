@@ -25,15 +25,15 @@ class TestHomeSongRadioPlayAll:
             time.sleep(2)
 
         with allure.step("Bước 2: Minimize Player"):
-            page.wait_and_tap(AndroidPlayerLocators.MINIMIZE_BTN)
+            page.minimize_player()
             time.sleep(1)
 
         with allure.step("Bước 3: Tap nút Refresh tại section 'Gợi ý bài hát'"):
-            page.wait_and_tap(AndroidHomeLocators.BTN_REFRESH)
+            page.scroll_and_tap(AndroidHomeLocators.BTN_REFRESH)
             time.sleep(2)
 
         with allure.step("Bước 4: Tap 'Phát tất cả' tại section 'Gợi ý bài hát' lần 2"):
-            page.wait_and_tap(AndroidHomeLocators.BTN_PHAT_TAT_CA)
+            page.scroll_and_tap(AndroidHomeLocators.BTN_PHAT_TAT_CA)
             time.sleep(2)
 
         with allure.step("Bước 5: Tap nút Pause trên màn hình Player"):

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Appium Server",
+      "runtimeExecutable": "appium",
+      "runtimeArgs": [],
+      "port": 4723
+    },
+    {
+      "name": "Allure Report Server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["view_report.py"],
+      "port": 8080
+    }
+  ]
+}

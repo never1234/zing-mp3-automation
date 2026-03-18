@@ -88,6 +88,18 @@ class BasePage:
     # --------------------------------------------------
     # Scroll
     # --------------------------------------------------
+    def scroll_and_tap(self, locator, max_scrolls=5, timeout=5):
+        """Cuộn xuống và tap element. Thử tối đa max_scrolls lần scroll_down trước khi tap.
+        An toàn hơn UIScrollable — không gây treo UiAutomator2 server.
+        """
+        for _ in range(max_scrolls):
+            try:
+                self.wait_and_tap(locator, timeout=timeout)
+                return
+            except Exception:
+                self.scroll_down()
+        self.wait_and_tap(locator)
+
     def scroll_down(self):
         """Cuộn xuống"""
         size   = self.driver.get_window_size()
@@ -132,11 +144,18 @@ class BasePage:
                 pass
 
         # 2. Lossless BTS + Promotion popup — cùng dùng btnNegative để dismiss
-        if self.is_visible(AndroidHomeLocators.POPUP_SKIP_BTN):
+        # Dùng is_visible_with_wait để chờ sheet render (xuất hiện trước khi Player load xong)
+        if self.is_visible_with_wait(AndroidHomeLocators.POPUP_SKIP_BTN, timeout=5):
             try:
                 self.tap(AndroidHomeLocators.POPUP_SKIP_BTN)
             except Exception:
                 pass
+
+    def minimize_player(self):
+        """Thu nhỏ full Player về mini player bằng Android back button.
+        Đáng tin cậy hơn tap MINIMIZE_BTN vì không phụ thuộc vào accessibility label.
+        """
+        self.driver.back()
 
     def dismiss_app_theme_sheet(self):
         """Đóng bottom sheet 'Chọn chủ đề' (App Theme) nếu đang hiển thị.

@@ -43,7 +43,16 @@
       "Bash(python3:*)",
       "Bash(python -m pytest tests/play_zingchart.py --collect-only --platform=android)",
       "Bash(python -m pytest tests/play_zingchart.py --platform=android -v -s)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(python -c \"import http.server; print\\(''http.server OK''\\)\")",
+      "Bash(where allure:*)",
+      "Bash(allure --version)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Google/Chrome/Application/**)",
+      "Bash(ls -t \"D:/OneDrive - VNG Group JSC/Zing MP3 Automation/zing-mp3-automation/reports/allure-results/\"*-result.json)",
+      "Bash(\"C:/Users/LAP16587/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s RFCX309KX8Z shell pm dump com.zing.mp3)",
+      "Bash(\"C:/Users/LAP16587/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s RFCX309KX8Z shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.LAUNCHER com.zing.mp3)",
+      "Bash(\"C:/Users/LAP16587/AppData/Local/Android/Sdk/platform-tools/adb.exe\" -s RFCX309KX8Z shell pm list packages)"
     ]
   }
 }
